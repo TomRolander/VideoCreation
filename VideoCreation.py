@@ -48,6 +48,7 @@ parser.add_argument('--inputdir', type=str, required=False)
 parser.add_argument('--outputdir', type=str, required=False)
 parser.add_argument('--firstimagenumber', type=int, required=False)
 parser.add_argument('--fps', type=int, required=False)
+parser.add_argument('--numberofpoints', type=int, required=False)
 parser.add_argument('--videocreate', required=False, choices=('True','False'))
 args = parser.parse_args()
 
@@ -99,6 +100,25 @@ else:
 print("Frames per second = ", end ="")
 print(frames_per_second)
 
+if type(args.numberofpoints) is NoneType:
+    number_of_points = 10
+else:
+    number_of_points = args.numberofpoints
+print("Number of points = ", end ="")
+print(number_of_points)
+
+count = 0
+# Iterate directory
+for path in os.listdir(input_dir_name):
+    # check if current path is a file
+    if os.path.isfile(os.path.join(input_dir_name, path)):
+        count += 1
+print('Input file count:', count)
+
+if count % number_of_points != 0:
+    print("Your number of input files is not a multiple of your number of points!")
+    exit(1)
+
 if type(args.videocreate) is NoneType or args.videocreate == True:
     print("Create MP4 video")
     bVideocreate = True
@@ -128,18 +148,6 @@ if bVideocreate == True:
         os.mkdir(videos_dir_name)
 
 
-count = 0
-# Iterate directory
-for path in os.listdir(input_dir_name):
-    # check if current path is a file
-    if os.path.isfile(os.path.join(input_dir_name, path)):
-        count += 1
-print('Input file count:', count)
-
-#quit()
-
-
-
 # Get list of all files only in the given directory
 list_of_files = filter( lambda x: os.path.isfile(os.path.join(input_dir_name, x)),
                         os.listdir(input_dir_name) )
@@ -148,7 +156,7 @@ list_of_files = sorted( list_of_files,
                         key = lambda x: os.path.getmtime(os.path.join(input_dir_name, x))
                         )
 
-for i in range(0, 10):
+for i in range(0, number_of_points):
     #print("\"" + watermarked_dir_name + "\\" + str(i) + "\"")
     isExist = os.path.exists(watermarked_dir_name + "\\" + str(i))
     if (isExist == False):
@@ -158,20 +166,20 @@ for i in range(0, 10):
 index = 0
 #base = 0
 for file_name in list_of_files:
-    if ((index % 10) == 0):
+    if ((index % number_of_points) == 0):
         base += 1
     input_file_path = os.path.join(input_dir_name, file_name)
     timestamp_str = time.strftime(  '%m/%d/%Y %H:%M:%S',
                                 time.gmtime(os.path.getmtime(input_file_path))) 
-    print(str(index).zfill(6), str((index % 10)), str(base).zfill(6), timestamp_str, file_name) 
-    output_file_path =  watermarked_dir_name + "\\" + str((index % 10)) + "\\" + str(base).zfill(6) + ".jpg"
+    print(str(index).zfill(6), str((index % number_of_points)), str(base).zfill(6), timestamp_str, file_name) 
+    output_file_path =  watermarked_dir_name + "\\" + str((index % number_of_points)) + "\\" + str(base).zfill(6) + ".jpg"
     #print(output_file_path)
     os.system("magick convert " + "\"" + input_file_path + "\"" + " -quiet -gravity northwest -font Arial-bold -pointsize 72 -fill black -annotate 90x90+100+30 %[exif:DateTimeOriginal] -fill white -annotate 90x90+103+33 %[exif:DateTimeOriginal] " + "\"" + output_file_path + "\"")
     #print ("Done")
     index += 1
 
 if bVideocreate == True:
-    for i in range(0, 10):
+    for i in range(0, number_of_points):
         #print (output_dir_name + "\\" + "P" + str(i) + "_%05d")
         #print (videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4")
         print ("ffmpeg -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf 35 -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4" + "\"")

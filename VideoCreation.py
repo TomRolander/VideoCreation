@@ -37,7 +37,8 @@ import os
 import time
 import subprocess
 import argparse
-from types import NoneType
+#from types import NoneType
+NoneType = type(None)
 
 print ("VideoCreation",Version, RevisionDate)
 

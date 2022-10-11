@@ -37,7 +37,9 @@ import os
 import time
 import subprocess
 import argparse
-#from types import NoneType
+import time
+from datetime import datetime
+
 NoneType = type(None)
 
 print ("VideoCreation",Version, RevisionDate)
@@ -54,8 +56,12 @@ args = parser.parse_args()
 
 if args.verbose:
     print(f"Create MP4 time lapse video from a folder of JPGs")
-print("done")
 
+now = datetime.now()
+start = time.time()
+
+start_time = now.strftime("%H:%M:%S")
+print("Start Time =", start_time)
 
 if type(args.inputdir) is NoneType:
     input_dir_name = os.getcwd() + "\\Input"
@@ -182,6 +188,11 @@ if bVideocreate == True:
     for i in range(0, number_of_points):
         #print (output_dir_name + "\\" + "P" + str(i) + "_%05d")
         #print (videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4")
-        print ("ffmpeg -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf 35 -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4" + "\"")
-        os.system("ffmpeg -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf 35 -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4" + "\"")
-        print ("Done")
+        print ("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf 35 -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4" + "\"")
+        os.system("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf 35 -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4" + "\"")
+
+end_time = now.strftime("%H:%M:%S")
+print("End Time =", end_time)
+end = time.time()
+print("Elapsed seconds = ", end ="")
+print('{:.1f}'.format(end - start))

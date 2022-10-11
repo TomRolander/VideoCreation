@@ -23,9 +23,7 @@
                 "--outputdir", ".\\Output",
                 "--fps", "8",
 To Do List
-    --numberofpoints
     mkdir .\Videos_16fps    etc
-    start time, end time, elapsed time
 
 
 """
@@ -39,6 +37,8 @@ import subprocess
 import argparse
 import time
 from datetime import datetime
+from datetime import timedelta
+
 
 NoneType = type(None)
 
@@ -194,5 +194,7 @@ if bVideocreate == True:
 end_time = now.strftime("%H:%M:%S")
 print("End Time =", end_time)
 end = time.time()
-print("Elapsed seconds = ", end ="")
-print('{:.1f}'.format(end - start))
+print("Elapsed time = ", end ="")
+#print('{:.1f}'.format(end - start))
+td = timedelta(seconds=int(end - start))
+print(td)

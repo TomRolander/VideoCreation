@@ -22,6 +22,7 @@
                 "--inputdir", ".\\Input",
                 "--outputdir", ".\\Output",
                 "--fps", "8",
+                
 To Do List
     mkdir .\Videos_16fps    etc
 

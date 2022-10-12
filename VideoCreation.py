@@ -8,7 +8,7 @@
   Original Code:  2022-10-08
 
   Tom Rolander, MSEE
-  Mentor, Circuit Design & Software
+  Mentor, Circuit Design, Software, and 3D Printing
   Miller Library, Fabrication Lab
   Hopkins Marine Station, Stanford University,
   120 Ocean View Blvd, Pacific Grove, CA 93950
@@ -38,7 +38,6 @@ import argparse
 import time
 from datetime import datetime
 from datetime import timedelta
-
 
 NoneType = type(None)
 
@@ -152,7 +151,6 @@ if bVideocreate == True:
     if (isExist == False):
         print("Creating Output Videos Dir ", videos_dir_name)
         os.mkdir(videos_dir_name)
-
 
 # Get list of all files only in the given directory
 list_of_files = filter( lambda x: os.path.isfile(os.path.join(input_dir_name, x)),

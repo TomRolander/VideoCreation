@@ -114,6 +114,11 @@ else:
 print("Number of points = ", end ="")
 print(number_of_points)
 
+isExist = os.path.exists(input_dir_name)
+if (isExist == False):
+    print("Input Dir does not exist", input_dir_name)
+    exit(1)
+
 count = 0
 # Iterate directory
 for path in os.listdir(input_dir_name):
@@ -132,11 +137,6 @@ if type(args.videocreate) is NoneType or args.videocreate == True:
 else:
     print("Only watermark files, no video will be created")
     bVideocreate = False
-
-isExist = os.path.exists(input_dir_name)
-if (isExist == False):
-    print("Input Dir does not exist", input_dir_name)
-    exit(1)
 
 isExist = os.path.exists(output_dir_name)
 if (isExist == False):

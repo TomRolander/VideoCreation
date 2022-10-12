@@ -6,7 +6,6 @@
   and create a video of the watermarked files (FFMPEG).
 
   Original Code:  2022-10-08
-  Revision:       2022-10-09
 
   Tom Rolander, MSEE
   Mentor, Circuit Design & Software
@@ -29,7 +28,7 @@ To Do List
 
 """
 Version = "Ver 0.11"
-RevisionDate = "2022-10-09"
+RevisionDate = "2022-10-12"
 
 import sys
 import os

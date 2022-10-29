@@ -178,7 +178,7 @@ for file_name in list_of_files:
     print(str(index).zfill(6), str((index % number_of_points)), str(base).zfill(6), timestamp_str, file_name) 
     output_file_path =  watermarked_dir_name + "\\" + str((index % number_of_points)) + "\\" + str(base).zfill(6) + ".jpg"
     #print(output_file_path)
-    os.system("magick convert " + "\"" + input_file_path + "\"" + " -quiet -gravity northwest -font Arial-bold -pointsize 72 -fill black -annotate 90x90+100+30 %[exif:DateTimeOriginal] -fill white -annotate 90x90+103+33 %[exif:DateTimeOriginal] " + "\"" + output_file_path + "\"")
+    os.system("magick convert " + "\"" + input_file_path + "\"" + " -quiet -gravity northwest -font Arial-bold -pointsize 144 -fill black -annotate 90x90+100+30 %[exif:DateTimeOriginal] -fill white -annotate 90x90+103+33 %[exif:DateTimeOriginal] " + "\"" + output_file_path + "\"")
     #print ("Done")
     index += 1
 

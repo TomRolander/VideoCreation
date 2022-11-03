@@ -27,8 +27,8 @@ To Do List
 
 
 """
-Version = "Ver 0.11"
-RevisionDate = "2022-10-12"
+Version = "Ver 0.2"
+RevisionDate = "2022-11-02"
 
 import sys
 import os
@@ -36,6 +36,8 @@ import time
 import subprocess
 import argparse
 import time
+import exifread
+
 from datetime import datetime
 from datetime import timedelta
 
@@ -118,16 +120,39 @@ if (isExist == False):
     exit(1)
 
 count = 0
+
 # Iterate directory
+
+# Get the file count
 for path in os.listdir(input_dir_name):
     # check if current path is a file
+    #print(path)
+    if path.endswith('JPG') == False:
+        continue        
     if os.path.isfile(os.path.join(input_dir_name, path)):
         count += 1
+        #print(os.path.join(input_dir_name, path))
 print('Input file count:', count)
 
 if count % number_of_points != 0:
     print("Your number of input files is not a multiple of your number of points!")
     exit(1)
+
+print('Rename files to EXIF Date Taken')
+for path in os.listdir(input_dir_name):
+    # check if current path is a file
+    #print(path)
+    if path.endswith('JPG') == False:
+        continue
+    with open(os.path.join(input_dir_name, path), "rb") as image:
+        exif = exifread.process_file(image)
+        dt = str(exif['EXIF DateTimeOriginal']) #get 'Date Taken' from JPG
+        ds = time.strptime(dt, '%Y:%m:%d %H:%M:%S')
+        nt = time.strftime("%Y-%m-%d_%H-%M-%S",ds)
+        newname = nt + ".JPG"
+        image.close()
+        #print("Rename " + os.path.join(input_dir_name,path) + " to " + os.path.join(input_dir_name,newname))
+        os.rename(os.path.join(input_dir_name,path), os.path.join(input_dir_name,newname))
 
 if type(args.videocreate) is NoneType or args.videocreate == True:
     print("Create MP4 video")
@@ -153,12 +178,15 @@ if bVideocreate == True:
         os.mkdir(videos_dir_name)
 
 # Get list of all files only in the given directory
-list_of_files = filter( lambda x: os.path.isfile(os.path.join(input_dir_name, x)),
-                        os.listdir(input_dir_name) )
+##list_of_files = filter( lambda x: os.path.isfile(os.path.join(input_dir_name, x)),
+##                        os.listdir(input_dir_name) )
 # Sort list of files based on last modification time in ascending order
-list_of_files = sorted( list_of_files,
-                        key = lambda x: os.path.getmtime(os.path.join(input_dir_name, x))
-                        )
+##list_of_files = sorted( list_of_files,
+##                        key = lambda x: os.path.getmtime(os.path.join(input_dir_name, x))
+##                        )
+
+list_of_files = sorted( filter( lambda x: os.path.isfile(os.path.join(input_dir_name, x)),
+                        os.listdir(input_dir_name) ) )
 
 for i in range(0, number_of_points):
     #print("\"" + watermarked_dir_name + "\\" + str(i) + "\"")
@@ -177,6 +205,7 @@ for file_name in list_of_files:
                                 time.gmtime(os.path.getmtime(input_file_path))) 
     print(str(index).zfill(6), str((index % number_of_points)), str(base).zfill(6), timestamp_str, file_name) 
     output_file_path =  watermarked_dir_name + "\\" + str((index % number_of_points)) + "\\" + str(base).zfill(6) + ".jpg"
+#    output_file_path =  watermarked_dir_name + "\\" + str((index % number_of_points)) + "\\" + file_name
     #print(output_file_path)
     os.system("magick convert " + "\"" + input_file_path + "\"" + " -quiet -gravity northwest -font Arial-bold -pointsize 144 -fill black -annotate 90x90+150+30 %[exif:DateTimeOriginal] -fill white -annotate 90x90+155+35 %[exif:DateTimeOriginal] " + "\"" + output_file_path + "\"")
     #print ("Done")

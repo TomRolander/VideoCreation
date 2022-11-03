@@ -23,8 +23,9 @@
                 "--fps", "16",
                 
 To Do List
-    mkdir .\Videos_16fps    etc
-
+    - compute average time between pics
+    - add optional string to -annotate
+            -annotate 90x90+150+30 %[exif:DateTimeOriginal]_fps" + str(frames_per_second).zfill(2) + " -fill
 
 """
 Version = "Ver 0.2"
@@ -51,6 +52,7 @@ parser.add_argument('--inputdir', type=str, required=False)
 parser.add_argument('--outputdir', type=str, required=False)
 parser.add_argument('--firstimagenumber', type=int, required=False)
 parser.add_argument('--fps', type=int, required=False)
+parser.add_argument('--crf', type=int, required=False, help="CRF range 0-50 default is 23")
 parser.add_argument('--numberofpoints', type=int, required=False)
 parser.add_argument('--videocreate', required=False, choices=('True','False'))
 args = parser.parse_args()
@@ -106,6 +108,13 @@ else:
     frames_per_second = args.fps
 print("Frames per second = ", end ="")
 print(frames_per_second)
+
+if type(args.crf) is NoneType:
+    constant_rate_factor = 23
+else:
+    constant_rate_factor = args.crf
+print("Constant rate factor = ", end ="")
+print(constant_rate_factor)
 
 if type(args.numberofpoints) is NoneType:
     number_of_points = 10
@@ -197,17 +206,19 @@ for i in range(0, number_of_points):
 
 index = 0
 #base = 0
+print("Watermarking photos:")
 for file_name in list_of_files:
     if ((index % number_of_points) == 0):
         base += 1
     input_file_path = os.path.join(input_dir_name, file_name)
-    timestamp_str = time.strftime(  '%m/%d/%Y %H:%M:%S',
-                                time.gmtime(os.path.getmtime(input_file_path))) 
-    print(str(index).zfill(6), str((index % number_of_points)), str(base).zfill(6), timestamp_str, file_name) 
+    #timestamp_str = time.strftime(  '%m/%d/%Y %H:%M:%S',
+    #                            time.gmtime(os.path.getmtime(input_file_path))) 
+    print(str(index+1).zfill(6), str((index % number_of_points)), str(base).zfill(6), file_name) 
     output_file_path =  watermarked_dir_name + "\\" + str((index % number_of_points)) + "\\" + str(base).zfill(6) + ".jpg"
 #    output_file_path =  watermarked_dir_name + "\\" + str((index % number_of_points)) + "\\" + file_name
     #print(output_file_path)
-    os.system("magick convert " + "\"" + input_file_path + "\"" + " -quiet -gravity northwest -font Arial-bold -pointsize 144 -fill black -annotate 90x90+150+30 %[exif:DateTimeOriginal] -fill white -annotate 90x90+155+35 %[exif:DateTimeOriginal] " + "\"" + output_file_path + "\"")
+
+    os.system("magick convert " + "\"" + input_file_path + "\"" + " -quiet -gravity northwest -font Arial-bold -pointsize 144 -fill black -annotate 90x90+150+30 %[exif:DateTimeOriginal] -fill white -annotate 90x90+155+35 %[exif:DateTimeOriginal] \"" + output_file_path + "\"")
     #print ("Done")
     index += 1
 
@@ -215,8 +226,8 @@ if bVideocreate == True:
     for i in range(0, number_of_points):
         #print (output_dir_name + "\\" + "P" + str(i) + "_%05d")
         #print (videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4")
-        print ("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf 35 -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4" + "\"")
-        os.system("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf 35 -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4" + "\"")
+        print ("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + ".mp4" + "\"")
+        os.system("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + ".mp4" + "\"")
 
 end_time = now.strftime("%H:%M:%S")
 print("End Time =", end_time)

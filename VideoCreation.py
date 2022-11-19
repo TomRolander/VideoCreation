@@ -38,11 +38,18 @@ import subprocess
 import argparse
 import time
 import exifread
+import datetime
+import array
+import statistics
+
+from scipy import stats
 
 from datetime import datetime
 from datetime import timedelta
 
 NoneType = type(None)
+
+minuteselapsed = array.array('f')
 
 print ("VideoCreation",Version, RevisionDate)
 
@@ -147,6 +154,9 @@ if count % number_of_points != 0:
     print("Your number of input files is not a multiple of your number of points!")
     exit(1)
 
+havepreviousvalue = False
+index = 0
+
 print('Rename files to EXIF Date Taken')
 for path in os.listdir(input_dir_name):
     # check if current path is a file
@@ -157,11 +167,25 @@ for path in os.listdir(input_dir_name):
         exif = exifread.process_file(image)
         dt = str(exif['EXIF DateTimeOriginal']) #get 'Date Taken' from JPG
         ds = time.strptime(dt, '%Y:%m:%d %H:%M:%S')
+        dd = datetime.strptime(dt, '%Y:%m:%d %H:%M:%S')
+        if havepreviousvalue == False:
+            havepreviousvalue = True
+        else:
+            delta = dd - dd_previous
+            minuteselapsed.append(delta.total_seconds()/60)
+            print(f"Time difference is {minuteselapsed[index]} minutes")
+            index = index + 1
+        dd_previous = dd
+
         nt = time.strftime("%Y-%m-%d_%H-%M-%S",ds)
         newname = nt + ".JPG"
         image.close()
         #print("Rename " + os.path.join(input_dir_name,path) + " to " + os.path.join(input_dir_name,newname))
-        os.rename(os.path.join(input_dir_name,path), os.path.join(input_dir_name,newname))
+        #os.rename(os.path.join(input_dir_name,path), os.path.join(input_dir_name,newname))
+
+print("{:.1f}".format(statistics.mean(minuteselapsed)))
+print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.2)))
+quit()
 
 if type(args.videocreate) is NoneType or args.videocreate == True:
     print("Create MP4 video")

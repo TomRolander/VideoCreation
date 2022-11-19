@@ -156,6 +156,7 @@ if count % number_of_points != 0:
 
 havepreviousvalue = False
 index = 0
+nmb = 0
 
 print('Rename files to EXIF Date Taken')
 for path in os.listdir(input_dir_name):
@@ -167,15 +168,18 @@ for path in os.listdir(input_dir_name):
         exif = exifread.process_file(image)
         dt = str(exif['EXIF DateTimeOriginal']) #get 'Date Taken' from JPG
         ds = time.strptime(dt, '%Y:%m:%d %H:%M:%S')
-        dd = datetime.strptime(dt, '%Y:%m:%d %H:%M:%S')
-        if havepreviousvalue == False:
-            havepreviousvalue = True
-        else:
-            delta = dd - dd_previous
-            minuteselapsed.append(delta.total_seconds()/60)
-            print(f"Time difference is {minuteselapsed[index]} minutes")
-            index = index + 1
-        dd_previous = dd
+
+        if ((index % number_of_points) == 0):
+            dd = datetime.strptime(dt, '%Y:%m:%d %H:%M:%S')
+            if havepreviousvalue == False:
+                havepreviousvalue = True
+            else:
+                delta = dd - dd_previous
+                minuteselapsed.append(delta.total_seconds()/60)
+                #print(f"Time difference is {minuteselapsed[nmb]} minutes")
+                nmb = nmb + 1
+            dd_previous = dd
+        index = index + 1
 
         nt = time.strftime("%Y-%m-%d_%H-%M-%S",ds)
         newname = nt + ".JPG"
@@ -183,8 +187,21 @@ for path in os.listdir(input_dir_name):
         #print("Rename " + os.path.join(input_dir_name,path) + " to " + os.path.join(input_dir_name,newname))
         #os.rename(os.path.join(input_dir_name,path), os.path.join(input_dir_name,newname))
 
-print("{:.1f}".format(statistics.mean(minuteselapsed)))
-print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.2)))
+if (index > 0):
+    print("Mean minutes between photos = ", end ="")
+    print("{:.1f}".format(statistics.mean(minuteselapsed)))
+    print("Trim mean minutes between photos of 0.025 = ", end ="")
+    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.025)))
+    print("Trim mean minutes between photos of 0.05 = ", end ="")
+    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.05)))
+    print("Trim mean minutes between photos of 0.10 = ", end ="")
+    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.10)))
+    print("Trim mean minutes between photos of 0.15 = ", end ="")
+    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.15)))
+    print("Trim mean minutes between photos of 0.20 = ", end ="")
+    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.20)))
+    print("Trim mean minutes between photos of 0.25 = ", end ="")
+    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.25)))
 quit()
 
 if type(args.videocreate) is NoneType or args.videocreate == True:

@@ -12,7 +12,7 @@
             "program": "${file}",
             "args": [
                 "--fps", "16",
-                "--numberofpoints", "1"
+                "--numberofpoints", "10"
             ],            
             "console": "integratedTerminal",
             "justMyCode": true

@@ -49,7 +49,7 @@ from datetime import timedelta
 
 NoneType = type(None)
 
-minuteselapsed = array.array('f')
+minutes_elapsed = array.array('f')
 
 print ("VideoCreation",Version, RevisionDate)
 
@@ -169,14 +169,14 @@ for path in os.listdir(input_dir_name):
         dt = str(exif['EXIF DateTimeOriginal']) #get 'Date Taken' from JPG
         ds = time.strptime(dt, '%Y:%m:%d %H:%M:%S')
 
-        if ((index % number_of_points) == 0):
+        if ((number_of_points == 1) or ((index % number_of_points) == 0)):
             dd = datetime.strptime(dt, '%Y:%m:%d %H:%M:%S')
             if havepreviousvalue == False:
                 havepreviousvalue = True
             else:
                 delta = dd - dd_previous
-                minuteselapsed.append(delta.total_seconds()/60)
-                #print(f"Time difference is {minuteselapsed[nmb]} minutes")
+                minutes_elapsed.append(delta.total_seconds()/60)
+                #print(f"Time difference is {minutes_elapsed[nmb]} minutes")
                 nmb = nmb + 1
             dd_previous = dd
         index = index + 1
@@ -185,24 +185,17 @@ for path in os.listdir(input_dir_name):
         newname = nt + ".JPG"
         image.close()
         #print("Rename " + os.path.join(input_dir_name,path) + " to " + os.path.join(input_dir_name,newname))
-        #os.rename(os.path.join(input_dir_name,path), os.path.join(input_dir_name,newname))
+        os.rename(os.path.join(input_dir_name,path), os.path.join(input_dir_name,newname))
 
 if (index > 0):
-    print("Mean minutes between photos = ", end ="")
-    print("{:.1f}".format(statistics.mean(minuteselapsed)))
-    print("Trim mean minutes between photos of 0.025 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.025)))
-    print("Trim mean minutes between photos of 0.05 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.05)))
-    print("Trim mean minutes between photos of 0.10 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.10)))
-    print("Trim mean minutes between photos of 0.15 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.15)))
-    print("Trim mean minutes between photos of 0.20 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.20)))
-    print("Trim mean minutes between photos of 0.25 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.25)))
-quit()
+    hours_per_second_of_video = "{:.1f}".format((frames_per_second * stats.trim_mean(minutes_elapsed, 0.10) ) / 60)
+else:
+    hours_per_second_of_video = "0.0"
+
+print("1 Sec Video = ", end ="")
+print(hours_per_second_of_video, end ="")
+print(" Hour Real Time")
+hours_per_second_of_video = "1Sec" + hours_per_second_of_video + "Hr"
 
 if type(args.videocreate) is NoneType or args.videocreate == True:
     print("Create MP4 video")
@@ -267,8 +260,8 @@ if bVideocreate == True:
     for i in range(0, number_of_points):
         #print (output_dir_name + "\\" + "P" + str(i) + "_%05d")
         #print (videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4")
-        print ("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + ".mp4" + "\"")
-        os.system("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + ".mp4" + "\"")
+        print ("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + "_" + hours_per_second_of_video + ".mp4" + "\"")
+        os.system("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + "_" + hours_per_second_of_video + ".mp4" + "\"")
 
 end_time = now.strftime("%H:%M:%S")
 print("End Time =", end_time)

@@ -202,7 +202,6 @@ if (index > 0):
     print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.20)))
     print("Trim mean minutes between photos of 0.25 = ", end ="")
     print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.25)))
-quit()
 
 if type(args.videocreate) is NoneType or args.videocreate == True:
     print("Create MP4 video")

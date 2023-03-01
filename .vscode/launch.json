@@ -11,7 +11,7 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "--fps", "10",
+                "--fps", "2",
                 "--numberofpoints", "1"
             ],            
             "console": "integratedTerminal",

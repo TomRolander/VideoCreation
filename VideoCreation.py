@@ -162,7 +162,7 @@ print('Rename files to EXIF Date Taken')
 for path in os.listdir(input_dir_name):
     # check if current path is a file
     #print(path)
-    if path.endswith('JPG') == False:
+    if (path.endswith('JPG') == False) and (path.endswith('jpg') == False) and (path.endswith('jpeg') == False):
         continue
     with open(os.path.join(input_dir_name, path), "rb") as image:
         exif = exifread.process_file(image)
@@ -189,19 +189,19 @@ for path in os.listdir(input_dir_name):
 
 if (index > 0):
     print("Mean minutes between photos = ", end ="")
-    print("{:.1f}".format(statistics.mean(minuteselapsed)))
+    print("{:.1f}".format(statistics.mean(minutes_elapsed)))
     print("Trim mean minutes between photos of 0.025 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.025)))
+    print("{:.1f}".format(stats.trim_mean(minutes_elapsed, 0.025)))
     print("Trim mean minutes between photos of 0.05 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.05)))
+    print("{:.1f}".format(stats.trim_mean(minutes_elapsed, 0.05)))
     print("Trim mean minutes between photos of 0.10 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.10)))
+    print("{:.1f}".format(stats.trim_mean(minutes_elapsed, 0.10)))
     print("Trim mean minutes between photos of 0.15 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.15)))
+    print("{:.1f}".format(stats.trim_mean(minutes_elapsed, 0.15)))
     print("Trim mean minutes between photos of 0.20 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.20)))
+    print("{:.1f}".format(stats.trim_mean(minutes_elapsed, 0.20)))
     print("Trim mean minutes between photos of 0.25 = ", end ="")
-    print("{:.1f}".format(stats.trim_mean(minuteselapsed, 0.25)))
+    print("{:.1f}".format(stats.trim_mean(minutes_elapsed, 0.25)))
     hours_per_second_of_video = "{:.1f}".format((frames_per_second * stats.trim_mean(minutes_elapsed, 0.10) ) / 60)
 else:
     hours_per_second_of_video = "0.0"

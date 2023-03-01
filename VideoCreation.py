@@ -143,7 +143,7 @@ count = 0
 for path in os.listdir(input_dir_name):
     # check if current path is a file
     #print(path)
-    if path.endswith('JPG') == False:
+    if (path.endswith('JPG') == False) and (path.endswith('jpg') == False) and (path.endswith('jpeg') == False):
         continue        
     if os.path.isfile(os.path.join(input_dir_name, path)):
         count += 1

@@ -28,8 +28,8 @@ To Do List
             -annotate 90x90+150+30 %[exif:DateTimeOriginal]_fps" + str(frames_per_second).zfill(2) + " -fill
 
 """
-Version = "Ver 0.2"
-RevisionDate = "2022-11-02"
+Version = "Ver 0.3"
+RevisionDate = "2023-03-03"
 
 import sys
 import os
@@ -41,6 +41,7 @@ import exifread
 import datetime
 import array
 import statistics
+import platform
 
 from scipy import stats
 
@@ -51,13 +52,20 @@ NoneType = type(None)
 
 minutes_elapsed = array.array('f')
 
+separator = "\\"
+
 print ("VideoCreation",Version, RevisionDate)
+if platform.system() == "Windows":
+    print("Running on Windows")
+else:
+    print("Running on Mac")
+    separator = "/"
 
 parser = argparse.ArgumentParser("Video Creation from Photos")
 parser.add_argument('--verbose', action='store_true', help="Show more context")
 parser.add_argument('--inputdir', type=str, required=False)
 parser.add_argument('--outputdir', type=str, required=False)
-parser.add_argument('--firstimagenumber', type=int, required=False)
+parser.add_argument('--nextimagenumber', type=int, required=False)
 parser.add_argument('--fps', type=int, required=False)
 parser.add_argument('--crf', type=int, required=False, help="CRF range 0-50 default is 23")
 parser.add_argument('--numberofpoints', type=int, required=False)
@@ -74,39 +82,39 @@ start_time = now.strftime("%H:%M:%S")
 print("Start Time =", start_time)
 
 if type(args.inputdir) is NoneType:
-    input_dir_name = os.getcwd() + "\\Input"
+    input_dir_name = os.getcwd() + separator + "Input"
 else:
     input_dir_name = args.inputdir
 print("Input Dir = ", end ="")
 print(input_dir_name)
 
 if type(args.outputdir) is NoneType:
-    output_dir_name = os.getcwd() + "\\Output"
-    watermarked_dir_name = output_dir_name + "\\Watermarked"
-    videos_dir_name = output_dir_name + "\\Videos"
+    output_dir_name = os.getcwd() + separator + "Output"
+    watermarked_dir_name = output_dir_name + separator + "Watermarked"
+    videos_dir_name = output_dir_name + separator + "Videos"
 else:
     output_dir_name = args.outputdir
-    watermarked_dir_name = args.outputdir + "\\Watermarked"
-    videos_dir_name = args.outputdir + "\\Videos"
+    watermarked_dir_name = args.outputdir + separator + "Watermarked"
+    videos_dir_name = args.outputdir + separator + "Videos"
 print("Output Dir Watermarked = ", end ="")
 print(watermarked_dir_name)
 print("Output Dir Videos = ", end ="")
 print(videos_dir_name)
 
-if type(args.firstimagenumber) is NoneType:
-    isExist = os.path.exists(watermarked_dir_name + "\\0")
+if type(args.nextimagenumber) is NoneType:
+    isExist = os.path.exists(watermarked_dir_name + separator + "0")
     if (isExist == False):
         base = 0
     else:
         base = 0
         # Iterate directory
-        for path in os.listdir(watermarked_dir_name + "\\0"):
+        for path in os.listdir(watermarked_dir_name + separator + "0"):
             # check if current path is a file
-            if os.path.isfile(os.path.join(watermarked_dir_name + "\\0", path)):
+            if os.path.isfile(os.path.join(watermarked_dir_name + separator + "0", path)):
                 base += 1
 else:
-    base = args.firstimagenumber
-print("First image number = ", end ="")
+    base = args.nextimagenumber - 1
+print("Next image number = ", end ="")
 print(base+1)
 
 if type(args.fps) is NoneType:
@@ -246,11 +254,11 @@ list_of_files = sorted( filter( lambda x: os.path.isfile(os.path.join(input_dir_
                         os.listdir(input_dir_name) ) )
 
 for i in range(0, number_of_points):
-    #print("\"" + watermarked_dir_name + "\\" + str(i) + "\"")
-    isExist = os.path.exists(watermarked_dir_name + "\\" + str(i))
+    #print("\"" + watermarked_dir_name + separator + "" + str(i) + "\"")
+    isExist = os.path.exists(watermarked_dir_name + separator + "" + str(i))
     if (isExist == False):
-        print("\"" + watermarked_dir_name + "\\" + str(i) + "\"")
-        os.mkdir(watermarked_dir_name + "\\" + str(i))
+        print("\"" + watermarked_dir_name + separator + "" + str(i) + "\"")
+        os.mkdir(watermarked_dir_name + separator + "" + str(i))
 
 index = 0
 #base = 0
@@ -262,8 +270,8 @@ for file_name in list_of_files:
     #timestamp_str = time.strftime(  '%m/%d/%Y %H:%M:%S',
     #                            time.gmtime(os.path.getmtime(input_file_path))) 
     print(str(index+1).zfill(6), str((index % number_of_points)), str(base).zfill(6), file_name) 
-    output_file_path =  watermarked_dir_name + "\\" + str((index % number_of_points)) + "\\" + str(base).zfill(6) + ".jpg"
-#    output_file_path =  watermarked_dir_name + "\\" + str((index % number_of_points)) + "\\" + file_name
+    output_file_path =  watermarked_dir_name + separator + "" + str((index % number_of_points)) + separator + "" + str(base).zfill(6) + ".jpg"
+#    output_file_path =  watermarked_dir_name + separator + "" + str((index % number_of_points)) + separator + "" + file_name
     #print(output_file_path)
 
     os.system("magick convert " + "\"" + input_file_path + "\"" + " -quiet -gravity northwest -font Arial-bold -pointsize 144 -fill black -annotate 90x90+150+30 %[exif:DateTimeOriginal] -fill white -annotate 90x90+155+35 %[exif:DateTimeOriginal] \"" + output_file_path + "\"")
@@ -272,10 +280,10 @@ for file_name in list_of_files:
 
 if bVideocreate == True:
     for i in range(0, number_of_points):
-        #print (output_dir_name + "\\" + "P" + str(i) + "_%05d")
-        #print (videos_dir_name + "\\" + "VideoPoint_" + str(i) + ".mp4")
-        print ("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + "_" + hours_per_second_of_video + ".mp4" + "\"")
-        os.system("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + "\\" + str(i) + "\\"+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + "\\" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + "_" + hours_per_second_of_video + ".mp4" + "\"")
+        #print (output_dir_name + separator + "" + "P" + str(i) + "_%05d")
+        #print (videos_dir_name + separator + "" + "VideoPoint_" + str(i) + ".mp4")
+        print ("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + separator + "" + str(i) + separator + ""+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + separator + "" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + "_" + hours_per_second_of_video + ".mp4" + "\"")
+        os.system("ffmpeg -loglevel error -r " + str(frames_per_second) + " -f image2 -s 1920x1080 -i " + "\"" + watermarked_dir_name + separator + "" + str(i) + separator + ""+ "%06d.jpg" + "\"" + " -vcodec libx264 -crf " + str(constant_rate_factor) + " -pix_fmt yuv420p -y " + "\"" + videos_dir_name + separator + "" + "Pt" + str(i) + "_fps" + str(frames_per_second).zfill(2) + "_crf" + str(constant_rate_factor).zfill(2) + "_" + hours_per_second_of_video + ".mp4" + "\"")
 
 end_time = now.strftime("%H:%M:%S")
 print("End Time =", end_time)
